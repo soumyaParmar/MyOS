@@ -1,0 +1,38 @@
+# Secret files
+.env
+*.env
+.env.*
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.DS_Store
+
+# Frontend
+node_modules/
+dist/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+agent-routing
+backend-development
+frontend-development
+MyOS_PLAN.md
+MyOS_PROGRESS.md
+MyOS_TODO.md
