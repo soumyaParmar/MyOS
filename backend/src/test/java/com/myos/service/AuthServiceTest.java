@@ -5,7 +5,6 @@ import com.myos.dto.LoginRequest;
 import com.myos.dto.RegisterRequest;
 import com.myos.entity.User;
 import com.myos.repository.UserRepository;
-import com.myos.security.EncryptionUtil;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,9 +94,8 @@ class AuthServiceTest {
     void shouldLoginSuccessfully() {
         // Arrange
         LoginRequest loginRequest = new LoginRequest("test@example.com", "password");
-        String emailHash = EncryptionUtil.hashForLookup("test@example.com");
         
-        when(userRepository.findByEmailHash(emailHash)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(jwtService.generateToken(testUser)).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(testUser)).thenReturn("refreshToken");
 
@@ -116,8 +114,7 @@ class AuthServiceTest {
         // Arrange
         request.setCookies(new Cookie("refresh_token", "validRefreshToken"));
         when(jwtService.extractUsername("validRefreshToken")).thenReturn("test@example.com");
-        String emailHash = EncryptionUtil.hashForLookup("test@example.com");
-        when(userRepository.findByEmailHash(emailHash)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(jwtService.isTokenValid("validRefreshToken", testUser)).thenReturn(true);
         when(jwtService.generateToken(testUser)).thenReturn("newAccessToken");
 
@@ -135,8 +132,7 @@ class AuthServiceTest {
         // Arrange
         request.setCookies(new Cookie("access_token", "validAccessToken"));
         when(jwtService.extractUsername("validAccessToken")).thenReturn("test@example.com");
-        String emailHash = EncryptionUtil.hashForLookup("test@example.com");
-        when(userRepository.findByEmailHash(emailHash)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
 
         // Act
         authService.logout(request, response);

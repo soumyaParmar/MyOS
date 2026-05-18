@@ -1,6 +1,5 @@
 package com.myos.service;
 
-import com.myos.security.EncryptionUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myos.dto.AuthenticationResponse;
@@ -115,9 +114,8 @@ public class AuthService {
                         request.getPassword()
                 )
         );
-        // Step 2: Find user by email hash (email column is encrypted, can't search directly)
-        String emailHash = EncryptionUtil.hashForLookup(request.getEmail());
-        var user = userRepository.findByEmailHash(emailHash)
+        // Step 2: Find user by email
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(); // Should never fail if authenticate() succeeded
 
         // Step 3-5: Generate tokens, revoke old ones, set cookies
@@ -178,8 +176,7 @@ public class AuthService {
         // Extract username and validate
         final String userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            String emailHash = EncryptionUtil.hashForLookup(userEmail);
-            var user = this.userRepository.findByEmailHash(emailHash)
+            var user = this.userRepository.findByEmail(userEmail)
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
@@ -228,8 +225,7 @@ public class AuthService {
         if (jwt != null) {
             var userEmail = jwtService.extractUsername(jwt);
             if (userEmail != null) {
-                String emailHash = EncryptionUtil.hashForLookup(userEmail);
-                var user = userRepository.findByEmailHash(emailHash).orElse(null);
+                var user = userRepository.findByEmail(userEmail).orElse(null);
                 if (user != null) {
                     tokenService.revokeAllUserTokens(user);
                 }

@@ -1,7 +1,5 @@
 package com.myos.service;
 
-import com.myos.security.EncryptionUtil;
-
 import com.myos.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -55,10 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Step 1: Hash the email for database lookup
-        String emailHash = EncryptionUtil.hashForLookup(email);
-        // Step 2: Search by the deterministic hash (not the encrypted email)
-        return userRepository.findByEmailHash(emailHash)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 }

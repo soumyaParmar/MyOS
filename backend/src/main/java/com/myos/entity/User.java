@@ -1,12 +1,12 @@
 package com.myos.entity;
 
-import com.myos.security.EncryptedStringConverter;
-import com.myos.security.EncryptionUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -43,17 +43,12 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false)
-    @Convert(converter = EncryptedStringConverter.class)
     private String name;
 
     @Email
     @NotBlank
-    @Column(nullable = false)
-    @Convert(converter = EncryptedStringConverter.class)
+    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(name = "email_hash", length = 64)
-    private String emailHash;
 
     @Column
     private String password;
@@ -62,14 +57,13 @@ public class User implements UserDetails {
     private String provider;
 
     @Column(name = "provider_id")
-    @Convert(converter = EncryptedStringConverter.class)
     private String providerId;
 
     @Column
     private String roles;
 
-    @Column(columnDefinition = "text")
-    @Convert(converter = EncryptedStringConverter.class)
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String preferences;
 
     @CreationTimestamp
@@ -80,9 +74,13 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    /** Bidirectional One-to-One mapping. */
+    /** Bidirectional One-to-One mapping for Extended Profile. */
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserProfile userProfile;
+
+    /** Bidirectional One-to-One mapping for Preferences. */
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserPreferences userPreferences;
 
     /** Convenience constructor for creating users programmatically. */
     public User(String name, String email, String password, String roles, String preferences) {
@@ -91,14 +89,6 @@ public class User implements UserDetails {
         this.password = password;
         this.roles = roles;
         this.preferences = preferences;
-    }
-
-    @PrePersist
-    @PreUpdate
-    private void computeEmailHash() {
-        if (email != null) {
-            this.emailHash = EncryptionUtil.hashForLookup(email);
-        }
     }
 
     // ======================== UserDetails INTERFACE METHODS ========================

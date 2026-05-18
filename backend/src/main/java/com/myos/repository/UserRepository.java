@@ -44,24 +44,24 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
-     * Finds a user by their email hash (SHA-256 digest of the lowercase email).
+     * Finds a user by their email address.
      *
      * HOW DOES THIS WORK WITHOUT WRITING SQL?
      * Spring Data JPA uses "query derivation" — it parses the method name and
      * generates the SQL automatically:
-     *   findByEmailHash(String emailHash)
-     *   → SELECT * FROM users WHERE email_hash = ?
+     *   findByEmail(String email)
+     *   → SELECT * FROM users WHERE email = ?
      *
      * The naming convention is: findBy + FieldName (in camelCase).
-     * Spring matches "EmailHash" to the "emailHash" field in the User entity.
+     * Spring matches "Email" to the "email" field in the User entity.
      */
-    Optional<User> findByEmailHash(String emailHash);
+    Optional<User> findByEmail(String email);
 
     /**
-     * Checks if a user exists with the given email hash.
+     * Checks if a user exists with the given email.
      *
-     * existsBy + FieldName → SELECT COUNT(*) > 0 FROM users WHERE email_hash = ?
+     * existsBy + FieldName → SELECT COUNT(*) > 0 FROM users WHERE email = ?
      * Returns true/false instead of loading the full entity (more efficient for checks).
      */
-    boolean existsByEmailHash(String emailHash);
+    boolean existsByEmail(String email);
 }

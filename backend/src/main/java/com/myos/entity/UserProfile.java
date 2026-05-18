@@ -1,6 +1,5 @@
 package com.myos.entity;
 
-import com.myos.security.EncryptedStringConverter;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,27 +44,19 @@ public class UserProfile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    /**
-     * @Convert(converter = EncryptedStringConverter.class)
-     * Transparently encrypts/decrypts this field.
-     */
     @Column(columnDefinition = "text")
-    @Convert(converter = EncryptedStringConverter.class)
     private String bio;
 
     @Column(columnDefinition = "text")
-    @Convert(converter = EncryptedStringConverter.class)
     private String skills;
 
     @Column(columnDefinition = "text")
-    @Convert(converter = EncryptedStringConverter.class)
     private String goals;
 
     /**
      * Stored as TEXT in DB to handle large resumes.
      */
     @Column(name = "resume_text", columnDefinition = "text")
-    @Convert(converter = EncryptedStringConverter.class)
     private String resumeText;
 
     /**

@@ -89,9 +89,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // Extract email from provider-specific attributes
         String email = extractEmail(registrationId, attributes);
 
-        // Find the user by email hash (email column is encrypted)
-        String emailHash = EncryptionUtil.hashForLookup(email);
-        User user = userRepository.findByEmailHash(emailHash)
+        // Find the user by email
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ServletException("User not found after OAuth2 authentication"));
 
         // Generate JWT tokens for the authenticated user

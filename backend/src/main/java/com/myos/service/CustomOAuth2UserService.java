@@ -1,7 +1,5 @@
 package com.myos.service;
 
-import com.myos.security.EncryptionUtil;
-
 import com.myos.entity.User;
 import com.myos.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -85,9 +83,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Email not found from OAuth2 provider");
         }
 
-        // Look up user by email hash (email is encrypted, so we search by hash)
-        String emailHash = EncryptionUtil.hashForLookup(email);
-        Optional<User> userOptional = userRepository.findByEmailHash(emailHash);
+        // Step 2: Look up the user in our database
+        Optional<User> userOptional = userRepository.findByEmail(email);
         User user;
 
         if (userOptional.isPresent()) {

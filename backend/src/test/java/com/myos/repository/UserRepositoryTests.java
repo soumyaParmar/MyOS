@@ -1,7 +1,6 @@
 package com.myos.repository;
 
 import com.myos.entity.User;
-import com.myos.security.EncryptionUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -62,37 +61,32 @@ public class UserRepositoryTests {
      * JUnit discovers and runs all methods with this annotation.
      */
     @Test
-    public void testSaveAndFindByEmailHash() {
+    public void testSaveAndFindByEmail() {
         // Given — Create a test user with all required fields
         User user = new User("Test User", "test@example.com", "password", "ROLE_USER", "{\"theme\": \"dark\"}");
 
-        // When — Save the user to the database, then look them up by email hash
+        // When — Save the user to the database, then look them up by email
         userRepository.save(user);
-        // Hash the email (SHA-256) for the lookup — we can't search by encrypted email
-        String emailHash = EncryptionUtil.hashForLookup("test@example.com");
-        Optional<User> foundUser = userRepository.findByEmailHash(emailHash);
+        Optional<User> foundUser = userRepository.findByEmail("test@example.com");
 
         // Then — Verify the user was found and has correct data
-        // assertThat() is from AssertJ — a fluent assertion library
         assertThat(foundUser).isPresent();                                      // User was found
-        assertThat(foundUser.get().getName()).isEqualTo("Test User");           // Name matches (decrypted by @Convert)
-        assertThat(foundUser.get().getPreferences()).contains("dark");         // Preferences decrypted correctly
+        assertThat(foundUser.get().getName()).isEqualTo("Test User");           // Name matches
+        assertThat(foundUser.get().getPreferences()).contains("dark");         // Preferences match
     }
 
     /**
      * Tests the existsByEmailHash() repository method.
      */
     @Test
-    public void testExistsByEmailHash() {
+    public void testExistsByEmail() {
         // Given — Save a user
         User user = new User("Another User", "another@example.com", "password", "ROLE_USER", null);
         userRepository.save(user);
 
         // When — Check existence for both existing and non-existing emails
-        String existsHash = EncryptionUtil.hashForLookup("another@example.com");
-        String notExistsHash = EncryptionUtil.hashForLookup("nonexistent@example.com");
-        boolean exists = userRepository.existsByEmailHash(existsHash);
-        boolean notExists = userRepository.existsByEmailHash(notExistsHash);
+        boolean exists = userRepository.existsByEmail("another@example.com");
+        boolean notExists = userRepository.existsByEmail("nonexistent@example.com");
 
         // Then — Verify results
         assertThat(exists).isTrue();       // This email exists in the DB

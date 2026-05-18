@@ -2,17 +2,12 @@ package com.myos.repository;
 
 import com.myos.entity.User;
 import com.myos.entity.UserProfile;
-import com.myos.security.EncryptedStringConverter;
-import com.myos.security.EncryptionUtil;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.crypto.SecretKey;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,23 +25,6 @@ public class UserProfileRepositoryTest {
 
     @Autowired
     private UserProfileRepository userProfileRepository;
-
-    /**
-     * Set up the encryption key manually for the test.
-     * 
-     * WHY DO WE NEED THIS?
-     * JPA creates instances of EncryptedStringConverter using the no-arg constructor.
-     * These instances rely on a static 'secretKey' field that is normally set by
-     * Spring's dependency injection. However, in @DataJpaTest, JPA might initialize
-     * before the Spring bean is ready. Manually setting it here ensures encryption works.
-     */
-    @BeforeAll
-    public static void setupEncryption() {
-        String testKey = "FNE0Pp6yrzuWKEWgkPWx6pj4A8ibUeaCy/3KPFsHfz0=";
-        SecretKey secretKey = EncryptionUtil.deriveKey(testKey);
-        // Use ReflectionTestUtils to set the private static field
-        ReflectionTestUtils.setField(EncryptedStringConverter.class, "secretKey", secretKey);
-    }
 
     @Test
     public void testSaveAndFindByUserId() {

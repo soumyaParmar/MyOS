@@ -1,0 +1,5 @@
+- [x] Create `UserPreferences` entity
+- [x] Create `UserPreferencesRepository`
+- [x] Add `UserPreferences` relationship to `User` entity
+- [x] Create Flyway migration script
+- [x] Verify implementation with a repository test

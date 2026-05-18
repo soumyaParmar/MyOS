@@ -36,10 +36,20 @@ spring:
   flyway:
     enabled: true
 
+  ai:
+    ollama:
+      base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://host.docker.internal:11434}
+      embedding:
+        enabled: true
+        model: ${SPRING_AI_OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+    vectorstore:
+      pgvector:
+        table-name: knowledge_base
+        column-name: embedding
+        dimensions: 1536 # Matches your V11 migration (1536 is OpenAI standard)
+
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
-  encryption:
-    key: ${ENCRYPTION_KEY}
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:3600000} # 1 hour

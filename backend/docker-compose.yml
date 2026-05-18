@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: myos-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -33,6 +33,8 @@ services:
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - OAUTH2_REDIRECT_URI=${OAUTH2_REDIRECT_URI}
+      - SPRING_AI_OLLAMA_BASE_URL=${SPRING_AI_OLLAMA_BASE_URL}
+      - SPRING_AI_OLLAMA_EMBEDDING_MODEL=${SPRING_AI_OLLAMA_EMBEDDING_MODEL}
     depends_on:
       db:
         condition: service_healthy
