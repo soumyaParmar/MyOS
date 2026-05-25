@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Mail, Settings, User, LogOut } from 'lucide-react';
+import { LayoutDashboard, Mail, Settings, User, LogOut, Brain } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 
 export function Sidebar() {
@@ -13,6 +13,7 @@ export function Sidebar() {
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Knowledge Base', href: '/dashboard/knowledge', icon: Brain },
     { name: 'Profile', href: '/profile', icon: User },
     { name: 'Messages', href: '#', icon: Mail },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
