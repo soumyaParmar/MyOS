@@ -27,7 +27,28 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * Handles validation errors (e.g., when @NotBlank or @Email constraints fail).
+     * Intercepts our custom MyOsException.
+     * Extracts its ErrorCode and builds a highly structured, meaningful error response.
+     */
+    @ExceptionHandler(MyOsException.class)
+    public ResponseEntity<ErrorResponse> handleMyOsException(
+            MyOsException ex, HttpServletRequest request) {
+        
+        ErrorCode ec = ex.getErrorCode();
+        ErrorResponse errorResponse = new ErrorResponse(
+                OffsetDateTime.now(),
+                ec.getStatus().value(),
+                ec.getStatus().getReasonPhrase(),
+                ec.getCode(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(errorResponse, ec.getStatus());
+    }
+
+    /**
+     * Intercepts validation errors (e.g., when @NotBlank or @Email constraints fail).
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
@@ -44,6 +65,7 @@ public class GlobalExceptionHandler {
                 OffsetDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ErrorCode.VALIDATION_FAILED.getCode(),
                 "Validation failed",
                 request.getRequestURI(),
                 errors
@@ -53,7 +75,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles login failures (wrong email or password).
+     * Intercepts login failures (wrong email or password).
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(
@@ -63,6 +85,7 @@ public class GlobalExceptionHandler {
                 OffsetDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                ErrorCode.UNAUTHORIZED.getCode(),
                 "Invalid email or password",
                 request.getRequestURI()
         );
@@ -71,7 +94,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles 403 Forbidden errors (user doesn't have the required role).
+     * Intercepts 403 Forbidden errors (user doesn't have the required role).
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(
@@ -81,11 +104,32 @@ public class GlobalExceptionHandler {
                 OffsetDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
                 HttpStatus.FORBIDDEN.getReasonPhrase(),
+                ErrorCode.ACCESS_DENIED.getCode(),
                 "You do not have permission to access this resource",
                 request.getRequestURI()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Intercepts standard Java validation exceptions like IllegalArgumentException
+     * and IllegalStateException, mapping them to structured BAD_REQUEST errors.
+     */
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentsAndStates(
+            RuntimeException ex, HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ErrorCode.VALIDATION_FAILED.getCode(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -99,6 +143,7 @@ public class GlobalExceptionHandler {
                 OffsetDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
                 "An unexpected error occurred. Please try again later.",
                 request.getRequestURI()
         );
