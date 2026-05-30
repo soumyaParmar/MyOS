@@ -17,6 +17,7 @@
         <java.version>21</java.version>
         <lombok.version>1.18.42</lombok.version>
         <spring-ai.version>1.0.0-M3</spring-ai.version>
+        <langgraph4j.version>1.8.17</langgraph4j.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -24,6 +25,13 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.bsc.langgraph4j</groupId>
+                <artifactId>langgraph4j-bom</artifactId>
+                <version>${langgraph4j.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -117,6 +125,10 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bsc.langgraph4j</groupId>
+            <artifactId>langgraph4j-core</artifactId>
         </dependency>
     </dependencies>
 
